@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.8.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<flow name="GetTokenValidationConfig">
+		<message-filter onUnaccepted="InvalidParameterFlow"
+			doc:name="Message">
+			<and-filter>
+				<expression-filter expression="#[originalPayload['type'] != null]" />
+				<expression-filter expression="#[originalPayload['mitraCode'] != null]" />
+				<expression-filter expression="#[originalPayload['signature'] != null]" />
+			</and-filter>
+		</message-filter>
+		<logger level="INFO" message="GET-TOKEN-VALIDATION : #[payload]"/>
+		<flow-ref name="GetTokenBPFlow"/>
+	</flow>
+	
+	<flow name="TransferValidationConfig">
+		<message-filter onUnaccepted="InvalidParameterFlow"
+			doc:name="Message">
+			<and-filter>
+				<expression-filter expression="#[originalPayload['type'] != null]" />
+				<expression-filter expression="#[originalPayload['debitAccountNumber'] != null]" />
+				<expression-filter expression="#[originalPayload['creditAccountNumber'] != null]" />
+				<expression-filter expression="#[originalPayload['nominal'] != null]" />
+				<expression-filter expression="#[originalPayload['swiftCode'] != null]" />
+				<expression-filter expression="#[originalPayload['beneficiaryName'] != null]" />
+				
+				<expression-filter expression="#[originalPayload['beneficiaryEmail'] != null]" />
+				<expression-filter expression="#[originalPayload['transferMethod'] != null]" />
+				<expression-filter expression="#[originalPayload['chargingModel'] != null]" />
+				<expression-filter expression="#[originalPayload['remark'] != null]" />
+				<expression-filter expression="#[originalPayload['clientReferenceNumber'] != null]" />
+				<expression-filter expression="#[originalPayload['extendedPaymentDetail'] != null]" />
+				
+				<expression-filter expression="#[originalPayload['paymentMethod'] != null]" />
+				<expression-filter expression="#[originalPayload['customerType'] != null]" />
+				<expression-filter expression="#[originalPayload['customerResident'] != null]" />
+				<expression-filter expression="#[originalPayload['username'] != null]" />
+				<expression-filter expression="#[originalPayload['time'] != null]" />
+				<expression-filter expression="#[originalPayload['signature'] != null]" />
+			</and-filter>
+		</message-filter>
+		<logger level="INFO" message="TRANSFER/PAYMENT-VALIDATION : #[payload]"/>
+		<flow-ref name="TransferBPFlow"/>
+	</flow>
+	
+	<flow name="StatusValidationConfig">
+		<message-filter onUnaccepted="InvalidParameterFlow"
+			doc:name="Message">
+			<and-filter>
+				<expression-filter expression="#[originalPayload['type'] != null]" />
+				<expression-filter expression="#[originalPayload['partnerUser'] != null]" />
+				<expression-filter expression="#[originalPayload['bankCode'] != null]" />
+				<expression-filter expression="#[originalPayload['creditAccountNumber'] != null]" />
+				<expression-filter expression="#[originalPayload['name'] != null]" />
+				<expression-filter expression="#[originalPayload['email'] != null]" />
+				<expression-filter expression="#[originalPayload['signature'] != null]" />
+			</and-filter>
+		</message-filter>
+		<logger level="INFO" message="VALIDATE-STATUS-VALIDATION : #[payload]"/>
+		<flow-ref name="ValidateStatusBPFlow"/>
+	</flow>
+</mule>

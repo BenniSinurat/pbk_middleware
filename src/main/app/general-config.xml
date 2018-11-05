@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.8.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<flow name="GetTokenConfigFlow">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="Get/Token" allowedMethods="POST" doc:name="HTTP">
+		</http:listener>
+		<message-filter doc:name="Filter favicon">
+			<not-filter>
+				<wildcard-filter pattern="/favicon.ico"
+					caseSensitive="true" />
+			</not-filter>
+		</message-filter>
+
+		<set-variable variableName="originalPayload" value="#[payload]"
+			doc:name="Variable" />
+		<set-variable value="#[message.id]" variableName="correlationID"
+			doc:name="Variable" />
+		<logger level="INFO"
+			message="[{#[correlationID]} : GET-TOKEN Request = #[originalPayload]]"
+			doc:name="Logger" />
+		<flow-ref name="GetTokenValidationConfig" doc:name="Flow Reference" />
+		<logger level="INFO"
+			message="[{#[correlationID]} GET-TOKEN Response = #[payload]]"
+			doc:name="Logger" />
+
+		<json:object-to-json-transformer
+			doc:name="Object to JSON" />
+		<exception-strategy ref="SessionException"
+			doc:name="Reference Exception Strategy" />
+	</flow>
+	
+	<flow name="TransferConfigFlow">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="Transfer" allowedMethods="POST" doc:name="HTTP">
+		</http:listener>
+		<message-filter doc:name="Filter favicon">
+			<not-filter>
+				<wildcard-filter pattern="/favicon.ico"
+					caseSensitive="true" />
+			</not-filter>
+		</message-filter>
+
+		<set-variable variableName="originalPayload" value="#[payload]"
+			doc:name="Variable" />
+		<set-variable value="#[message.id]" variableName="correlationID"
+			doc:name="Variable" />
+		<logger level="INFO"
+			message="[{#[correlationID]} : TRANSFER/PAYMENT Request = #[originalPayload]]"
+			doc:name="Logger" />
+		<flow-ref name="TransferValidationConfig" doc:name="Flow Reference" />
+		<logger level="INFO"
+			message="[{#[correlationID]} TRANSFER/PAYMENT Response = #[payload]]"
+			doc:name="Logger" />
+
+		<json:object-to-json-transformer
+			doc:name="Object to JSON" />
+		<exception-strategy ref="SessionException"
+			doc:name="Reference Exception Strategy" />
+	</flow>
+	
+	<flow name="ValidateStatusConfigFlow">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="Validate/Status" allowedMethods="POST" doc:name="HTTP">
+		</http:listener>
+		<message-filter doc:name="Filter favicon">
+			<not-filter>
+				<wildcard-filter pattern="/favicon.ico"
+					caseSensitive="true" />
+			</not-filter>
+		</message-filter>
+
+		<set-variable variableName="originalPayload" value="#[payload]"
+			doc:name="Variable" />
+		<set-variable value="#[message.id]" variableName="correlationID"
+			doc:name="Variable" />
+		<logger level="INFO"
+			message="[{#[correlationID]} : VALIDATE-STATUS Request = #[originalPayload]]"
+			doc:name="Logger" />
+		<flow-ref name="StatusValidationConfig" doc:name="Flow Reference" />
+		<logger level="INFO"
+			message="[{#[correlationID]} VALIDATE-STATUS Response = #[payload]]"
+			doc:name="Logger" />
+
+		<json:object-to-json-transformer
+			doc:name="Object to JSON" />
+		<exception-strategy ref="SessionException"
+			doc:name="Reference Exception Strategy" />
+	</flow>
+</mule>

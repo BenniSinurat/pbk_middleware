@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.8.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<flow name="TransferBPFlow">
+		<expression-component doc:name="Expression">
+			<![CDATA[responseMap = new java.util.HashMap();
+				responseMap['tp'] = originalPayload['type'];
+				responseMap['nrd'] = originalPayload['debitAccountNumber'];
+				responseMap['nrk'] = originalPayload['creditAccountNumber'];
+				responseMap['nmnl'] = originalPayload['nominal'];
+				responseMap['swcd'] = originalPayload['swiftCode'];
+				responseMap['bfcn'] = originalPayload['beneficiaryName'];
+				
+				responseMap['tfmtd'] = originalPayload['transferMethod'];
+				responseMap['chrgmdl'] = originalPayload['chargingModel'];
+				responseMap['rmk'] = originalPayload['remark'];
+				responseMap['cltrn'] = originalPayload['clientReferenceNumber'];
+				responseMap['extdpayd'] = originalPayload['extendedPaymentDetail'];
+				responseMap['bfceml'] = originalPayload['beneficiaryEmail'];
+				
+				responseMap['paymtd'] = originalPayload['paymentMethod'];
+				responseMap['custp'] = originalPayload['customerType'];
+				responseMap['cusrd'] = originalPayload['customerResident'];
+				responseMap['usrnm'] = originalPayload['username'];
+				responseMap['wkt'] = originalPayload['time'];
+				responseMap['sgn'] = originalPayload['signature'];
+			payload = responseMap;]]>
+		</expression-component>
+		<json:object-to-json-transformer
+			doc:name="JSON to Object" />
+		<http:request config-ref="HTTP_Request_Configuration"
+			path="/" method="POST" doc:name="HTTP">
+			<http:request-builder>
+				<http:header headerName="Content-Type"
+					value="application/json" />
+			</http:request-builder>
+			<http:success-status-code-validator
+				values="200,400,401,403,404,409,440,444,498,500,503,504,598,599" />
+		</http:request>
+		<json:json-to-object-transformer
+			returnClass="java.lang.Object" doc:name="JSON to Object" />
+		<logger level="INFO" message="GET-TOKEN-RESPONSE: #[payload]" />
+		<set-variable value="#[payload.st]" variableName="status"
+			doc:name="Variable" />
+		<choice>
+			<when expression="#[flowVars['status'] == 00]">
+				<logger level="INFO" message="GET-TOKEN-RESPONSE #[payload.st]: #[payload]" />
+				<expression-component doc:name="Expression">
+					<![CDATA[responseMap = new java.util.HashMap();
+						responseMap['type'] = payload['tp'];
+						responseMap['debitAccountNumber'] = payload['nrd'];
+						responseMap['creditAccountNumber'] = payload['nrk'];
+						responseMap['nominal'] = payload['nmnl'];
+						responseMap['swiftCode'] = payload['swcd'];
+						responseMap['beneficiaryName'] = payload['bfcn'];
+						
+						responseMap['transferMethod'] = payload['tfmtd'];
+						responseMap['chargingModel'] = payload['chrgmdl'];
+						responseMap['remark'] = payload['rmk'];
+						responseMap['clientReferenceNumber'] = payload['cltrn'];
+						responseMap['extendedPaymentDetail'] = payload['extdpayd'];
+						responseMap['beneficiaryEmail'] = payload['bfceml'];
+						
+						responseMap['paymentMethod'] = payload['paymtd'];
+						responseMap['customerType'] = payload['custp'];
+						responseMap['customerResident'] = payload['cusrd'];
+						responseMap['username'] = payload['usrnm'];
+						responseMap['time'] = payload['wkt'];
+						responseMap['signature'] = payload['sgn'];
+						
+						responseMap['jpaReff'] = payload['jprf'];
+						responseMap['status'] = flowVars['status'];
+					payload = responseMap;]]>
+				</expression-component>
+			</when>
+			<otherwise>
+				<logger level="INFO" message="GET-TOKEN-RESPONSE #[payload.st]: #[payload]" />
+				<expression-component doc:name="Expression">
+					<![CDATA[responseMap = new java.util.HashMap();
+						responseMap['type'] = payload['tp'];
+						responseMap['debitAccountNumber'] = payload['nrd'];
+						responseMap['creditAccountNumber'] = payload['nrk'];
+						responseMap['nominal'] = payload['nmnl'];
+						responseMap['swiftCode'] = payload['swcd'];
+						responseMap['beneficiaryName'] = payload['bfcn'];
+						
+						responseMap['transferMethod'] = payload['tfmtd'];
+						responseMap['chargingModel'] = payload['chrgmdl'];
+						responseMap['remark'] = payload['rmk'];
+						responseMap['clientReferenceNumber'] = payload['cltrn'];
+						responseMap['extendedPaymentDetail'] = payload['extdpayd'];
+						responseMap['beneficiaryEmail'] = payload['bfceml'];
+						
+						responseMap['paymentMethod'] = payload['paymtd'];
+						responseMap['customerType'] = payload['custp'];
+						responseMap['customerResident'] = payload['cusrd'];
+						responseMap['username'] = payload['usrnm'];
+						responseMap['time'] = payload['wkt'];
+						responseMap['signature'] = payload['sgn'];
+						
+						responseMap['jpaReff'] = payload['jprf'];
+						responseMap['status'] = flowVars['status'];
+					payload = responseMap;]]>
+				</expression-component>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
